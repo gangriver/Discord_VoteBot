@@ -1,259 +1,272 @@
-# VoteBot 📊 - Discord 인터랙티브 투표 봇
+# VoteBot 📊
 
-## 🎯 개요
+A Discord bot for creating interactive polls with automated voting, scheduling, and statistics.
 
-VoteBot은 Discord 서버에서 사용할 수 있는 완전한 기능의 투표 시스템입니다. 실시간 투표, 자동 집계, 예약 마감 등의 고급 기능을 제공하여 커뮤니티 의사결정을 효율적으로 돕습니다.
+## Features
 
-## ✨ 주요 기능
+- **Slash Commands**: Modern Discord slash command interface
+- **Interactive Voting**: Button-based voting with real-time updates
+- **Poll Types**: Single or multiple choice polls
+- **Anonymous Voting**: Optional anonymous poll mode
+- **Scheduled Closing**: Automatic poll expiration
+- **Duplicate Prevention**: Built-in vote validation and idempotency
+- **Statistics**: Comprehensive poll analytics
+- **Persistent Storage**: PostgreSQL database with Prisma ORM
+- **Job Queue**: Redis-based job scheduling with BullMQ
 
-### 🗳️ 투표 생성 및 관리
-- **다양한 투표 유형**: 단일/복수 선택 투표 지원
-- **익명 투표**: 투표자 신원 보호 옵션
-- **예약 마감**: 지정된 시간에 자동으로 투표 종료
-- **실시간 집계**: 투표 결과 실시간 업데이트
-- **진행 상황 시각화**: 프로그레스 바로 투표 현황 표시
+## Commands
 
-### 🎮 인터랙티브 UI
-- **버튼 기반 투표**: 클릭 한 번으로 간편한 투표 참여
-- **이모지 지원**: 각 선택지마다 직관적인 이모지 표시
-- **즉시 피드백**: 투표 후 즉각적인 확인 메시지
-- **토글 기능**: 같은 선택지 재클릭으로 투표 취소 가능
+### `/poll create`
+Create a new poll with the following options:
+- `title` (required): Poll title (max 256 characters)
+- `options` (required): Poll options separated by semicolons (2-10 options)
+- `description` (optional): Poll description (max 1024 characters)
+- `multiple` (optional): Allow multiple selections (default: false)
+- `anonymous` (optional): Anonymous voting (default: false)
+- `duration` (optional): Poll duration in minutes (1-10080 minutes)
 
-### 📊 통계 및 분석
-- **실시간 통계**: 투표 진행 중에도 현재 결과 확인
-- **상세 분석**: 투표 수, 비율, 참여자 정보 제공
-- **결과 요약**: 투표 종료 후 최종 결과 자동 발표
-
-## 🚀 사용법
-
-### 기본 투표 생성
+**Example:**
 ```
-/poll create title:"점심 메뉴 결정" options:"한식;중식;일식;양식"
-```
-
-### 복수 선택 투표
-```
-/poll create title:"선호하는 게임 장르" options:"RPG;FPS;전략;시뮬레이션" multiple:true
+/poll create title:"What's your favorite color?" options:"Red;Blue;Green;Yellow" multiple:false duration:60
 ```
 
-### 익명 투표
-```
-/poll create title:"팀장 만족도 조사" options:"매우 만족;만족;보통;불만족" anonymous:true
-```
+### `/poll close`
+Close an active poll (only poll creator can close):
+- `poll_id` (required): The poll ID to close
 
-### 시간 제한 투표
-```
-/poll create title:"이벤트 시간 투표" options:"오후 2시;오후 6시;오후 8시" duration:60
-```
+### `/poll stats`
+Get detailed statistics for a poll:
+- `poll_id` (required): The poll ID for statistics
 
-### 완전한 투표 설정
-```
-/poll create title:"회사 워크숍 장소" 
-             description:"2024년 봄 워크숍 장소를 결정합니다" 
-             options:"제주도;부산;강릉;대전" 
-             multiple:false 
-             anonymous:true 
-             duration:1440
-```
+## Installation & Setup
 
-## 📋 명령어 목록
+### Prerequisites
+- Node.js 20+
+- PostgreSQL 15+
+- Redis 7+
+- Discord Bot Token
 
-### `/poll create` - 새 투표 생성
-**필수 매개변수:**
-- `title`: 투표 제목 (최대 256자)
-- `options`: 투표 선택지 (`;`으로 구분, 2-10개)
+### Local Development
 
-**선택 매개변수:**
-- `description`: 투표 설명 (최대 1024자)
-- `multiple`: 복수 선택 허용 (기본값: false)
-- `anonymous`: 익명 투표 (기본값: false)
-- `duration`: 투표 시간 (분 단위, 1-10080분/7일)
-
-### `/poll close` - 투표 수동 종료
-- `poll_id`: 종료할 투표 ID (투표 작성자만 가능)
-
-### `/poll stats` - 투표 통계 조회
-- `poll_id`: 통계를 확인할 투표 ID
-
-### `/ping` - 봇 연결 상태 테스트
-- 매개변수 없음
-- 봇의 응답 시간과 연결 상태 확인
-
-## 🏗️ 기술 스택
-
-### Backend Infrastructure
-- **Node.js + TypeScript**: 안전하고 확장 가능한 서버 로직
-- **Discord.js**: Discord API와의 완벽한 통합
-- **PostgreSQL + Prisma**: 안정적인 데이터 저장 및 관리
-- **Redis + BullMQ**: 예약 작업 및 백그라운드 처리
-
-### Key Features
-- **실시간 상호작용**: 3초 이내 응답으로 원활한 사용자 경험
-- **데이터 무결성**: 중복 투표 방지 및 트랜잭션 처리
-- **자동화**: 예약된 투표 마감 및 결과 발표
-- **확장성**: 대용량 서버와 동시 투표 지원
-
-## 🎛️ 고급 기능
-
-### 투표 유형별 특징
-
-#### 📝 단일 선택 투표 (기본)
-- 한 사람당 하나의 선택지만 선택 가능
-- 다른 선택지 클릭 시 기존 투표 자동 변경
-- 가장 일반적인 의사결정 방식
-
-#### ✅ 복수 선택 투표
-- 한 사람이 여러 선택지 동시 선택 가능
-- 각 선택지 독립적으로 토글 가능
-- 설문조사나 선호도 조사에 적합
-
-#### 🔒 익명 투표
-- 투표자 신원 완전 보호
-- 통계에서 투표자 목록 숨김
-- 민감한 주제나 평가에 활용
-
-### 자동화 시스템
-
-#### ⏰ 예약 마감
-- 설정된 시간에 자동으로 투표 종료
-- 마감 시 결과 자동 발표
-- 투표 버튼 비활성화 처리
-
-#### 📊 실시간 업데이트
-- 투표할 때마다 즉시 결과 반영
-- 프로그레스 바 실시간 업데이트
-- 투표 수와 비율 자동 계산
-
-## 🔒 보안 및 안정성
-
-### 데이터 보호
-- **중복 투표 방지**: 데이터베이스 제약조건으로 완벽 차단
-- **SQL 인젝션 방지**: Prisma ORM으로 안전한 쿼리 처리
-- **개인정보 보호**: 익명 투표 시 투표자 정보 완전 보호
-
-### 시스템 안정성
-- **오류 처리**: 모든 상황에 대한 graceful error handling
-- **백업 시스템**: Redis 기반 작업 큐로 안정적인 예약 처리
-- **로깅**: 상세한 디버그 로그로 문제 추적 가능
-
-## 📈 사용 사례
-
-### 👥 커뮤니티 관리
-- **이벤트 계획**: 시간, 장소, 활동 결정
-- **규칙 투표**: 서버 규칙 변경 사항 결정
-- **컨텐츠 선택**: 다음 활동이나 주제 선정
-
-### 🎮 게임 클랜/길드
-- **스크림 일정**: 팀 연습 시간 조율
-- **전략 결정**: 게임 전략이나 포지션 배정
-- **장비/캐릭터**: 팀 구성 및 역할 분담
-
-### 🏢 업무 환경
-- **회의 일정**: 팀 미팅 시간 조율  
-- **프로젝트 우선순위**: 작업 순서 결정
-- **만족도 조사**: 익명으로 팀 피드백 수집
-
-### 🎯 교육 환경
-- **수업 주제**: 다음 강의 내용 선택
-- **과제 마감일**: 학생들과 일정 조율
-- **평가 방식**: 시험 형태나 방법 결정
-
-## 🎨 UI/UX 특징
-
-### 직관적인 디자인
-- **컬러 코딩**: 진행 중(파란색), 종료(회색) 상태 구분
-- **이모지 활용**: 1️⃣2️⃣3️⃣ 등으로 선택지 명확 구분
-- **프로그레스 바**: █░░░░ 형태로 시각적 결과 표시
-
-### 사용자 친화적 피드백
-- **즉시 응답**: 투표 후 "Voted for [선택지]" 메시지
-- **상태 표시**: 현재 투표 상황을 실시간으로 확인
-- **오류 안내**: 문제 발생 시 명확한 해결 방법 제시
-
-## 📊 성능 최적화
-
-### 응답 시간
-- **평균 응답 시간**: 400-900ms (데이터베이스 처리 포함)
-- **최대 처리 시간**: Discord 3초 제한 내 완료 보장
-- **실시간 처리**: 투표 버튼 클릭 즉시 결과 반영
-
-### 확장성
-- **동시 사용자**: 무제한 동시 투표 참여 가능
-- **투표 수**: 서버당 무제한 투표 생성
-- **데이터 저장**: PostgreSQL로 안정적인 대용량 처리
-
-## 🛠️ 설치 및 배포
-
-### 개발 환경 설정
-1. Node.js 20+ 설치
-2. PostgreSQL 및 Redis 실행
-3. 환경변수 설정 (.env 파일)
-4. 의존성 설치: `npm install`
-5. 데이터베이스 마이그레이션: `npm run db:push`
-6. 슬래시 명령 배포: `npx tsx src/scripts/deployCommands.ts`
-7. 봇 실행: `npm run dev`
-
-### 프로덕션 배포
+1. **Clone the repository:**
 ```bash
-# Docker Compose 사용
+git clone <repository-url>
+cd VoteBot
+```
+
+2. **Install dependencies:**
+```bash
+npm install
+```
+
+3. **Set up environment variables:**
+```bash
+cp .env.example .env
+```
+
+Edit `.env` with your configuration:
+```env
+DISCORD_TOKEN=your_discord_bot_token_here
+DISCORD_CLIENT_ID=your_discord_client_id_here
+DATABASE_URL="postgresql://username:password@localhost:5432/votebot"
+REDIS_URL="redis://localhost:6379"
+NODE_ENV=development
+```
+
+4. **Start development services:**
+```bash
+# Start PostgreSQL and Redis
+docker-compose -f docker-compose.dev.yml up -d
+
+# Or use your local installations
+```
+
+5. **Set up the database:**
+```bash
+# Generate Prisma client
+npm run db:generate
+
+# Run database migrations
+npm run db:migrate
+
+# (Optional) Open Prisma Studio
+npm run db:studio
+```
+
+6. **Deploy Discord commands:**
+```bash
+npx tsx src/scripts/deployCommands.ts
+```
+
+7. **Start the bot:**
+```bash
+# Development mode with hot reload
+npm run dev
+
+# Or start worker separately
+npm run worker
+```
+
+### Docker Deployment
+
+1. **Create production environment file:**
+```bash
+cp .env.example .env
+```
+
+2. **Configure production variables:**
+```env
+DISCORD_TOKEN=your_production_bot_token
+DISCORD_CLIENT_ID=your_production_client_id
+POSTGRES_PASSWORD=secure_postgres_password
+REDIS_PASSWORD=secure_redis_password
+```
+
+3. **Deploy with Docker Compose:**
+```bash
+# Production deployment
 docker-compose up -d
 
-# 또는 개별 서비스 배포
-# - Database: PostgreSQL
-# - Cache: Redis  
-# - Application: Node.js
-# - Worker: Background job processor
+# Or with custom env file
+docker-compose --env-file .env.prod up -d
 ```
 
-## 🐛 문제 해결
+4. **Run database migrations:**
+```bash
+docker-compose exec bot npx prisma migrate deploy
+```
 
-### 일반적인 문제들
+### Cloud Deployment
 
-#### "애플리케이션이 응답하지 않았습니다"
-- **원인**: 봇이 오프라인이거나 데이터베이스 연결 문제
-- **해결**: 봇 상태 확인 후 재시작
+#### Railway/Render/Fly.io
 
-#### 슬래시 명령이 보이지 않음
-- **원인**: 명령어 배포 실패 또는 권한 부족
-- **해결**: 명령어 재배포 및 봇 권한 확인
+1. **Deploy services separately:**
+   - **Database**: PostgreSQL service
+   - **Redis**: Redis service  
+   - **Bot**: Main application
+   - **Worker**: Background job processor
 
-#### 투표 버튼이 작동하지 않음
-- **원인**: 상호작용 핸들러 오류
-- **해결**: 콘솔 로그 확인 후 봇 재시작
+2. **Environment variables:**
+```env
+NODE_ENV=production
+DISCORD_TOKEN=your_bot_token
+DISCORD_CLIENT_ID=your_client_id
+DATABASE_URL=your_postgresql_connection_string
+REDIS_URL=your_redis_connection_string
+```
 
-### 로그 분석
-- `📥 Interaction received`: 명령 수신 확인
-- `🔧 Processing slash command`: 명령 처리 시작
-- `⏱️ Interaction processed in XXXms`: 처리 완료 시간
-- `prisma:query`: 데이터베이스 쿼리 실행 내역
+3. **Build commands:**
+```bash
+npm install && npm run build
+```
 
-## 🔮 향후 계획
+4. **Start commands:**
+   - **Bot**: `npm start`
+   - **Worker**: `npm run worker`
 
-### 추가 예정 기능
-- **투표 템플릿**: 자주 사용하는 투표 형식 저장
-- **투표 복사**: 기존 투표를 기반으로 새 투표 생성
-- **결과 내보내기**: CSV, JSON 형태로 결과 다운로드
-- **투표 히스토리**: 과거 투표 결과 조회 및 관리
+## Architecture
 
-### 성능 개선
-- **캐싱 시스템**: 자주 조회되는 투표 결과 캐시
-- **배치 처리**: 대용량 투표 결과 효율적 처리
-- **실시간 알림**: 웹소켓 기반 실시간 업데이트
+### Core Components
 
----
+- **Bot Process** (`src/bot.ts`): Main Discord bot handling commands and interactions
+- **Worker Process** (`src/worker.ts`): Background job processor for scheduled tasks
+- **Database Layer** (`src/database/`): Prisma ORM with PostgreSQL
+- **Job Queue** (`src/jobs/`): BullMQ with Redis for scheduled poll closing
+- **Services** (`src/services/`): Business logic and vote processing
+- **Commands** (`src/commands/`): Discord slash command handlers
 
-## 📞 지원 및 피드백
+### Data Models
 
-VoteBot을 사용하시면서 문제가 발생하거나 제안사항이 있으시면 언제든지 연락 주세요!
+#### Poll
+- Unique ID, title, description
+- Guild/channel/creator information
+- Multiple/anonymous voting settings
+- Status (OPEN/CLOSED) and expiration
 
-**개발 정보:**
-- 개발 언어: TypeScript
-- 프레임워크: Discord.js v14
-- 데이터베이스: PostgreSQL + Prisma
-- 작업 큐: Redis + BullMQ
-- 배포: Docker Compose
+#### PollOption
+- Poll option text and emoji
+- Position ordering
+- Linked to parent poll
 
-**라이센스:** ISC License
+#### Vote
+- User/poll/option relationship
+- Unique constraint prevents duplicates
+- Cascading deletes with polls
 
----
-*VoteBot - Making community decisions easier, one vote at a time! 🗳️✨*
+### Security Features
+
+- **Duplicate Prevention**: Database constraints prevent double voting
+- **Input Validation**: Comprehensive validation on all inputs
+- **Rate Limiting**: Built into Discord's interaction system
+- **Permission Checks**: Creator-only poll management
+- **SQL Injection Protection**: Prisma ORM prevents SQL injection
+
+## Testing
+
+```bash
+# Run all tests
+npm test
+
+# Run tests with coverage
+npm test -- --coverage
+
+# Run tests in watch mode
+npm test -- --watch
+```
+
+## Monitoring & Logs
+
+### Application Logs
+- Structured logging with timestamps
+- Error tracking and debugging information
+- Job processing status and metrics
+
+### Health Checks
+- Database connection monitoring
+- Redis connection status
+- Discord API connectivity
+
+### Metrics
+- Poll creation/completion rates
+- Vote processing times
+- Error rates and types
+
+## Troubleshooting
+
+### Common Issues
+
+**Bot not responding to commands:**
+1. Check bot permissions in Discord server
+2. Verify slash commands are deployed: `npx tsx src/scripts/deployCommands.ts`
+3. Check console for connection errors
+
+**Database connection errors:**
+1. Verify PostgreSQL is running and accessible
+2. Check DATABASE_URL format and credentials
+3. Run migrations: `npm run db:migrate`
+
+**Job queue not processing:**
+1. Verify Redis is running and accessible
+2. Check REDIS_URL configuration
+3. Ensure worker process is running
+
+**Vote duplicates:**
+1. Check database constraints are properly set
+2. Verify unique index on (userId, pollId, optionId)
+3. Review error logs for constraint violations
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature-name`
+3. Write tests for new functionality
+4. Ensure all tests pass: `npm test`
+5. Submit a pull request
+
+## License
+
+This project is licensed under the ISC License - see the package.json file for details.
+
+## Support
+
+For issues and feature requests, please create an issue on the repository.
