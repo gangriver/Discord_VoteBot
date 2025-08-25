@@ -1,0 +1,38 @@
+{
+  "name": "votebot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node dist/bot.js",
+    "dev": "nodemon --exec tsx src/bot.ts",
+    "build": "tsc",
+    "worker": "tsx src/worker.ts",
+    "test": "jest",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@prisma/client": "^6.14.0",
+    "@types/node": "^24.3.0",
+    "bullmq": "^5.58.1",
+    "discord.js": "^14.22.1",
+    "dotenv": "^17.2.1",
+    "ioredis": "^5.7.0",
+    "prisma": "^6.14.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.0.5",
+    "nodemon": "^3.1.10",
+    "tsx": "^4.20.5"
+  }
+}

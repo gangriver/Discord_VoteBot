@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Poll {
+  id               String       @id @default(cuid())
+  title            String
+  description      String?
+  guildId          String
+  channelId        String
+  messageId        String?
+  creatorId        String
+  allowMultiple    Boolean      @default(false)
+  isAnonymous      Boolean      @default(false)
+  status           PollStatus   @default(OPEN)
+  expiresAt        DateTime?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  options          PollOption[]
+  votes            Vote[]
+
+  @@index([guildId])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+model PollOption {
+  id          String @id @default(cuid())
+  text        String
+  emoji       String?
+  pollId      String
+  position    Int
+  createdAt   DateTime @default(now())
+
+  poll        Poll   @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  votes       Vote[]
+
+  @@index([pollId])
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  userId    String
+  pollId    String
+  optionId  String
+  createdAt DateTime @default(now())
+
+  poll      Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  option    PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, pollId, optionId])
+  @@index([pollId])
+  @@index([userId])
+}
+
+enum PollStatus {
+  OPEN
+  CLOSED
+}
